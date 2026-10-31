@@ -651,6 +651,19 @@ describe("the interior walk on rules with no prompt glyph (M56 spec 14)", () => 
     expect(findInputFrame(lines(RULE, "  line one", "  line two", RULE, ...footer), PI)!.interior.text).toBe("line one line two");
   });
 
+  it("recognizes Gentle's rounded Pi editor and reads its draft", () => {
+    const top = "╭─ ✿ ────── 🚀 ⟡ worker-high · medium ⟡ ctx ? ?% ⟡ $0.000 ⟡ usage ─╮";
+    const bottom = "╰─  ─────────────────────────────────────────────── ~/work ⎇ dev ─╯";
+    const tail = ["✿", "🧠 project · ready ⟡ graft synced"];
+    const row = (text: string): string => `│  ${text.padEnd(62)}│`;
+    const empty = findInputFrame(lines(top, row("type, or / for commands"), bottom, ...tail), PI);
+    expect(empty).not.toBeNull();
+    expect(empty?.placeholder).toBe(true);
+    expect(findInputFrame(lines(top, row("hello there"), bottom, ...tail), PI)?.interior.text).toBe("hello there");
+    expect(findInputFrame(lines(top, row("first line"), row("second line"), bottom, ...tail), PI)?.interior.text).toBe("first line second line");
+    expect(findInputFrame(lines(top, row("draft"), ...tail), PI)).toBeNull();
+  });
+
   it("reads the Working label on the top rule", () => {
     const frame = findInputFrame(lines("reply", "── ⠴ Working ──────────────", "", RULE, ...footer), PI)!;
     expect(frame.label).toBe("⠴ Working");

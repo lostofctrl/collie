@@ -5,6 +5,7 @@ import { lineText, splitLines, type StyledLine } from "../../blocks";
 import {
   composerDraft, composerPrompt, composerStatusLines, locateComposer, tailRule,
 } from "./composer";
+import { piAdapter } from "./index";
 
 function fixture(name: string): StyledLine[] {
   return splitLines(parseAnsi(readFileSync(
@@ -22,6 +23,20 @@ function row(value: string): StyledLine {
 const idle = capture("idle");
 const rule = lineText(idle[0]!).trimEnd();
 const blue = "\x1b[38;2;97;133;204m";
+
+describe("rounded custom Pi editor", () => {
+  it("recognizes the live empty editor so a guarded send can begin", () => {
+    // Sanitized from a Pi 1.4.0 screen with a custom editor and footer.
+    const lines = [
+      row(`${blue}╭─ ✿ ──────────────────────────────── 🚀 ⟡ worker-high · medium ⟡ ctx ? ?% ⟡ $0.000 ⟡ usage ─╮`),
+      row(`${blue}│\x1b[0m \x1b[7m \x1b[0m type, or / for commands                                                                  ${blue}│`),
+      row(`${blue}╰─  ────────────────────────────────────────────────────────── ~/project ⎇ branch ─╯`),
+      row(`${blue}✿`),
+      row(`${blue}🧠 project · ready ⟡ status`),
+    ];
+    expect(piAdapter.composerReady?.(lines)).toBe(true);
+  });
+});
 
 describe("OmO composer", () => {
   it("locates the editor when the captured idle tail has three status rows", () => {
